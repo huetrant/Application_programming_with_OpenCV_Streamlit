@@ -1,0 +1,4 @@
+**/__pycache__
+**.Identifier
+**/secret_key.json
+**/secrets.toml
