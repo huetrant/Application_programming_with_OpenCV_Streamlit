@@ -37,7 +37,7 @@ if uploaded_image is not None:
         height = width * h // w
 
         # Resize image to maintain aspect ratio
-        raw_image = raw_image.resize((width, height), Image.ANTIALIAS)
+        raw_image = raw_image.resize((width, height), Image.Resampling.LANCZOS)
 
         canvas_result = st_canvas(
             background_image=raw_image,
