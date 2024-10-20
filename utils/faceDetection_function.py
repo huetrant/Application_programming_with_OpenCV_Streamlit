@@ -4,74 +4,112 @@ import xml.etree.ElementTree as ET
 from sklearn.neighbors import KNeighborsClassifier
 
 
-class Extractor:
-    def __init__(self, cascade_file, n_neighbors=5):
-        self.haar_features = []
-        self.knn = KNeighborsClassifier(n_neighbors=n_neighbors, weights="distance")
-
-        cascade = ET.parse(cascade_file)
-        features = cascade.getroot().findall(".//features/_/rects")
-        for feature in features:
-            haar_feature = []
-            rects = feature.findall("_")
-            for rect in rects:
-                x, y, w, h, wt = map(int, map(float, rect.text.strip().split()))
-                haar_feature.append((x, y, w, h, wt))
-            self.haar_features.append(haar_feature)
-
-    def extract_feature_image(self, img):
-        """Extract the haar feature for the current image"""
-        image = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        ii = cv2.integral(image)
-        features = []
-        for haar_feature in self.haar_features:
-            value = 0
-            for rect in haar_feature:
-                x, y, w, h, wt = rect
-                value += wt * (
-                    ii[y + h][x + w] - ii[y][x + w] - ii[y + h][x] + ii[y][x]
-                )
-            features.append(value)
-        return np.asarray(features)
-
-    def fit(self, X, y):
-        self.knn.fit(X, y)
-
-    def detect_multiscale(self, img, scale_factor=1.1, step_size=10, prob=0.85):
-        """Detect objects in the image at multiple scales"""
-        faces = []
-        org_h, org_w = img.shape[:2]
-
-        scale = 1.0
-        while scale > 0.1:
-            resized = cv2.resize(img.copy(), (int(org_w * scale), int(org_h * scale)))
-            new_h, new_w = resized.shape[:2]
-
-            arr_boxs, arr_features = [], []
-            for y in range(0, new_h - 24, step_size):
-                for x in range(0, new_w - 24, step_size):
-                    roi = resized[y : y + 24, x : x + 24]
-                    features = self.extract_feature_image(roi)
-                    arr_features.append(features)
-                    arr_boxs.append((x, y, 24, 24))
-
-            if len(arr_features) > 0:
-                _prob = self.knn.predict_proba(arr_features)
-                _cls = self.knn.predict(arr_features)
-                for i in range(len(_cls)):
-                    if _cls[i] == 1 and _prob[i][1] >= prob:
-                        x, y, w, h = arr_boxs[i]
-                        real_x, real_y = int(x / scale), int(y / scale)
-                        real_w, real_h = int(w / scale), int(h / scale)
-                        faces.append((real_x, real_y, real_w, real_h))
-
-            scale /= scale_factor
-
-        return faces
+import cv2
+import numpy as np
+import os
 
 
-def get_iou(ground_truth: np.ndarray, mask: np.ndarray):
-    """Calculate the Intersection over Union (IoU) between the ground truth and the mask"""
-    intersection = np.logical_and(ground_truth, mask)
-    union = np.logical_or(ground_truth, mask)
-    return np.sum(intersection) / np.sum(union)
+# Hàm để tải và xử lý ảnh
+def preprocess_image(image_file):
+    # Chuyển đổi đối tượng file sang mảng NumPy
+    img = np.array(image_file)
+
+    # Lấy kích thước ảnh gốc
+    original_height, original_width = img.shape[:2]
+
+    # Kích thước mong muốn cho việc phát hiện
+    desired_size = 128
+
+    # Tính tỷ lệ thu nhỏ
+    if original_width > original_height:
+        scale = desired_size / original_width
+    else:
+        scale = desired_size / original_height
+
+    # Resize ảnh giữ tỷ lệ
+    new_width = int(original_width * scale)
+    new_height = int(original_height * scale)
+    resized_img = cv2.resize(img, (new_width, new_height))
+
+    # Tạo vùng đệm (padding) để đưa về kích thước 128x128
+    padded_img = np.zeros((desired_size, desired_size, 3), dtype=np.uint8)
+
+    # Tính toán vị trí để đặt ảnh đã resize vào giữa vùng đệm
+    x_offset = (desired_size - new_width) // 2
+    y_offset = (desired_size - new_height) // 2
+
+    # Đặt ảnh đã resize vào vùng đệm
+    padded_img[y_offset:y_offset + new_height, x_offset:x_offset + new_width] = resized_img
+
+    # Chuyển ảnh đã padding sang ảnh xám
+    gray = cv2.cvtColor(padded_img, cv2.COLOR_BGR2GRAY)
+
+    return padded_img, gray, scale
+# Hàm tính IoU
+def calculate_iou(box1, box2):
+    x1, y1, w1, h1 = box1
+    x2, y2, w2, h2 = box2
+
+    # Tính tọa độ của góc trên bên trái và góc dưới bên phải
+    x_left = max(x1, x2)
+    y_top = max(y1, y2)
+    x_right = min(x1 + w1, x2 + w2)
+    y_bottom = min(y1 + h1, y2 + h2)
+
+    # Tính diện tích của phần giao nhau
+    intersection_area = max(0, x_right - x_left) * max(0, y_bottom - y_top)
+
+    # Tính diện tích của hai bounding box
+    box1_area = w1 * h1
+    box2_area = w2 * h2
+
+    # Tính diện tích hợp
+    union_area = box1_area + box2_area - intersection_area
+
+    # Tính IoU
+    iou = intersection_area / union_area if union_area > 0 else 0
+    return iou
+
+def distance(v1,v2):
+    return np.sqrt(((v1-v2)**2).sum())
+def knn (train,test,k=5):
+    dist=[]
+    for i in range(train.shape[0]):
+        ix=train[i,:-1]
+        iy=train[i,-1]
+        d=distance(test,ix)
+        dist.append([d,iy])
+    dk=sorted(dist,key=lambda x: x[0])[:k]
+    labels=np.array(dk)[:,-1]
+    output=np.unique(labels,return_counts=True)
+    index=np.argmax(output[1])
+    return output[0][index]
+
+import numpy as np
+import os
+
+def load_and_prepare_data(face_data, non_face_data):
+    """
+    Đọc và chuẩn bị dữ liệu từ các file npy, sau đó tạo ra trainset kết hợp từ face_data và non_face_data.
+
+    Parameters:
+    working_dir (str): Đường dẫn đến thư mục làm việc chứa dữ liệu.
+
+    Returns:
+    trainset (ndarray): Mảng kết hợp từ dữ liệu và nhãn của face_data và non_face_data.
+    """
+
+    # Tạo nhãn (label) cho face và non_face
+    face_labels = np.ones((face_data.shape[0],))  # 1 cho face
+    non_face_labels = np.zeros((non_face_data.shape[0],))  # 0 cho non-face
+
+    # Kết hợp dữ liệu của face và non_face
+    data = np.concatenate((face_data, non_face_data), axis=0)
+
+    # Kết hợp nhãn của face và non_face
+    labels = np.concatenate((face_labels, non_face_labels), axis=0).reshape((-1, 1))
+
+    # Tạo trainset bằng cách kết hợp dữ liệu và nhãn
+    trainset = np.concatenate((data, labels), axis=1)
+
+    return trainset

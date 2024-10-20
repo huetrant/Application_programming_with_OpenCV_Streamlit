@@ -1,0 +1,11 @@
+1.jpg: Average IoU = 0.5008
+2.jpg: Average IoU = 0.3456
+3.png: Average IoU = 0.6986
+4.png: Average IoU = 0.0270
+5.jpg: Average IoU = 0.2140
+6.jpg: Average IoU = 0.3526
+7.png: Average IoU = 0.2475
+8.jpg: Average IoU = 0.5013
+9.jpg: Average IoU = 0.3262
+10.jpeg: Average IoU = 0.5275
+
