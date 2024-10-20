@@ -274,7 +274,7 @@ def display_result():
                     # Vẽ hình chữ nhật trên ảnh gốc
                     cv2.rectangle(image, (x_orig, y_orig), (x_orig + w_orig, y_orig + h_orig), (0, 255, 0), 2)
         # Hiển thị ảnh kết quả
-    st.image(image, channels="RGB")
+        st.image(image, channels="RGB")
 
 
 
