@@ -151,7 +151,7 @@ def display_methods():
     st.write(
         """
         - Các vòng tròn màu **:green[xanh lục]** là **keypoints** ground truth.
-        - Các hình tròn màu **:red[đỏ]** là **keypoints** được phát hiện với ngưỡng bán kính đánh giá là $5$ pixels bởi thuật toán **SIFT**.
+        - Các hình tròn màu **:red[đỏ]** là **keypoints** được phát hiện với ngưỡng bán kính đánh giá là $3$ pixels bởi thuật toán **SIFT**.
         """
     )
     # Phần hiển thị của ORB
@@ -217,7 +217,7 @@ def display_methods():
     st.write(
         """
         - Các vòng tròn màu **:green[xanh lục]** là **keypoints** ground truth.
-        - Các hình tròn màu **:red[đỏ]** là **keypoints** được phát hiện với ngưỡng bán kính đánh giá là $5$ pixels bởi thuật toán **ORB**.
+        - Các hình tròn màu **:red[đỏ]** là **keypoints** được phát hiện với ngưỡng bán kính đánh giá là $3$ pixels bởi thuật toán **ORB**.
         """
     )
 
@@ -319,14 +319,15 @@ def display_results():
 
 @st.fragment()
 def display_discussion():
+
     st.header("5. Thảo luận")
     st.markdown("""
-- Biểu đồ precision và recall cho thấy sự khác biệt rõ rệt giữa hai phương pháp phát hiện đặc trưng hình ảnh 
-là **SIFT** và **ORB** . 
-- Đặc biệt, **ORB** thể hiện hiệu suất vượt trội trong các hình dạng như **checkerboard**, **cube**, **multiple polygons**, **polygon**, và **star**. 
-Điều này cho thấy ORB có khả năng nhận diện và phân loại các đặc trưng của những hình dạng phức tạp và có nhiều góc cạnh hơn, 
-đồng thời giữ được độ chính xác cao trong quá trình phát hiện.
-""")
+        - Biểu đồ precision và recall cho thấy sự khác biệt rõ rệt giữa hai phương pháp phát hiện đặc trưng hình ảnh 
+        là **SIFT** và **ORB** . 
+        - Đặc biệt, **ORB** thể hiện hiệu suất vượt trội trong các hình dạng như **checkerboard**, **cube**, **multiple polygons**, **polygon**, và **star**. 
+        Điều này cho thấy ORB có khả năng nhận diện và phân loại các đặc trưng của những hình dạng phức tạp và có nhiều góc cạnh hơn, 
+        đồng thời giữ được độ chính xác cao trong quá trình phát hiện.
+        """)
     st.markdown("###### Keypoints do SIFT phát hiện")
     sift_columns = st.columns(5)
 
@@ -384,7 +385,7 @@ là **SIFT** và **ORB** .
     thường là những đặc trưng có độ bền cao hơn, như các đường thẳng và các họa tiết lặp lại. 
         - Kết quả này cho thấy SIFT vẫn là một công cụ hữu ích trong các tình huống cụ thể, 
     đặc biệt là khi xử lý hình ảnh có tính chất đơn giản và rõ ràng hơn.
-""")
+    """)
   
     col1,col2 = st.columns(2)
     with col1:
@@ -421,7 +422,10 @@ là **SIFT** và **ORB** .
                 Nếu bài toán yêu cầu phát hiện các hình dạng phức tạp và có nhiều chi tiết, **ORB** có thể là lựa chọn tối ưu. 
                 Tuy nhiên, nếu bài toán tập trung vào các đặc trưng rõ ràng và đơn giản, **SIFT** vẫn có thể là một công cụ đáng tin cậy.
 
-""")
+    """)
+
+
+display_datasets()   
 display_methods()
 display_metric()
 display_results()
