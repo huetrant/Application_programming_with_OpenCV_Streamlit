@@ -35,6 +35,22 @@ orb = cv2.ORB_create()
 precision_recall_sift: np.ndarray = np.load(os.path.join(DATA_DIR, "precision_recall_sift.npy"))
 precision_recall_orb: np.ndarray = np.load(os.path.join(DATA_DIR, "precision_recall_orb.npy"))
 
+def process_image(datatype, index, detector):
+    image = cv2.imread(os.path.join(datatype[index], "images", "6.png"))
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
+    # Phát hiện keypoints
+    keypoints = detector.detect(gray, None)
+    
+    # Đọc ground truth
+    ground_truth = np.load(os.path.join(datatype[index], "points", "6.npy"))
+    
+    # Vẽ keypoints và ground truth lên ảnh
+    image = draw_points(image, [(kp.pt[1], kp.pt[0]) for kp in keypoints], (255, 0, 0), 1, 5)
+    image = draw_points(image, ground_truth, (0, 255, 0))
+    
+    return image
+
 @st.fragment()
 def display_datasets():
     st.header("1. Synthetic Shapes Datasets")
@@ -55,8 +71,8 @@ def display_datasets():
 
     for i in range(4):
         # Vòng lặp đầu tiên xử lý cols1
-        points = np.load(os.path.join(DATATYPES[i], "points", "1.npy"))
-        image = cv2.imread(os.path.join(DATATYPES[i], "images", "1.png"))
+        points = np.load(os.path.join(DATATYPES[i], "points", "6.npy"))
+        image = cv2.imread(os.path.join(DATATYPES[i], "images", "6.png"))
         # Hiển thị ảnh
         cols1[i].image(draw_points(image, points), use_column_width=True)
 
@@ -65,8 +81,8 @@ def display_datasets():
         cols1[i].markdown(f"<div style='text-align: center; font-weight: bold;'>{caption}</div>", unsafe_allow_html=True)
 
         # Vòng lặp thứ hai xử lý cols2
-        points = np.load(os.path.join(DATATYPES[i + 4], "points", "1.npy"))
-        image = cv2.imread(os.path.join(DATATYPES[i + 4], "images", "1.png"))
+        points = np.load(os.path.join(DATATYPES[i + 4], "points", "6.npy"))
+        image = cv2.imread(os.path.join(DATATYPES[i + 4], "images", "6.png"))
         # Hiển thị ảnh
         cols2[i].image(draw_points(image, points), use_column_width=True)
 
@@ -112,11 +128,11 @@ def display_methods():
     # Hiển thị 8 ảnh với 2 dòng, mỗi dòng 4 ảnh
     cols = st.columns(4)
     for i in range(8):
-        image = cv2.imread(os.path.join(DATATYPES[i], "images", "1.png"))
+        image = cv2.imread(os.path.join(DATATYPES[i], "images", "6.png"))
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         keypoints = sift.detect(gray, None)
 
-        ground_truth = np.load(os.path.join(DATATYPES[i], "points", "1.npy"))
+        ground_truth = np.load(os.path.join(DATATYPES[i], "points", "6.npy"))
         image = draw_points(
             image, [(kp.pt[1], kp.pt[0]) for kp in keypoints], (255, 0, 0), 1,1,5
         )
@@ -177,11 +193,11 @@ def display_methods():
     # Hiển thị 8 ảnh với 2 dòng, mỗi dòng 4 ảnh
     cols = st.columns(4)
     for i in range(8):
-        image = cv2.imread(os.path.join(DATATYPES[i], "images", "1.png"))
+        image = cv2.imread(os.path.join(DATATYPES[i], "images", "6.png"))
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         keypoints = orb.detect(gray, None)
 
-        ground_truth = np.load(os.path.join(DATATYPES[i], "points", "1.npy"))
+        ground_truth = np.load(os.path.join(DATATYPES[i], "points", "6.npy"))
         image = draw_points(
             image, [(kp.pt[1], kp.pt[0]) for kp in keypoints], (255, 0, 0), 1,1,5
         )
@@ -252,9 +268,8 @@ def display_results():
 
     col1, col2= st.columns(2)
     with col1:
-        st.markdown("<p style='text-align: center;font-size: 20px;'>Biểu đồ so sánh độ chính xác (Precision) giữa SIFT và ORB trên các loại hình.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='text-align: center;font-size: 20px;'>Biểu đồ so sánh độ đo Precision giữa SIFT và ORB trên các loại hình.</p>", unsafe_allow_html=True)
 
-        # st.subheader("Biểu đồ kết quả với độ đo Precision")
         precision_df = pd.DataFrame(
             {
                 "shape_type": [
@@ -276,6 +291,12 @@ def display_results():
         )
 
     with col2:
+        st.markdown(
+            "<p style='text-align: center; font-size: 20px;'>"
+            "Biểu đồ so sánh đô đo Recall giữa SIFT và ORB trên các loại hình."
+            "</p>",
+            unsafe_allow_html=True
+        )
         recall_df = pd.DataFrame(
             {
                 "shape_type": [
@@ -296,9 +317,112 @@ def display_results():
             color=["#2ECC71", "#F39C12"],
         )
 
-        st.markdown("#### Biểu đồ kết quả với độ đo Recall")
+@st.fragment()
+def display_discussion():
+    st.header("5. Thảo luận")
+    st.markdown("""
+- Biểu đồ precision và recall cho thấy sự khác biệt rõ rệt giữa hai phương pháp phát hiện đặc trưng hình ảnh 
+là **SIFT** và **ORB** . 
+- Đặc biệt, **ORB** thể hiện hiệu suất vượt trội trong các hình dạng như **checkerboard**, **cube**, **multiple polygons**, **polygon**, và **star**. 
+Điều này cho thấy ORB có khả năng nhận diện và phân loại các đặc trưng của những hình dạng phức tạp và có nhiều góc cạnh hơn, 
+đồng thời giữ được độ chính xác cao trong quá trình phát hiện.
+""")
+    st.markdown("###### Keypoints do SIFT phát hiện")
+    sift_columns = st.columns(5)
 
-display_datasets()
+    for i in range(8):
+        if  i == 2 or i == 3 or i == 7 : 
+            continue  
+
+        # Đọc ảnh
+        image = cv2.imread(os.path.join(DATATYPES[i], "images", "6.png"))
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        keypoints = sift.detect(gray, None)  
+
+        # Đọc ground truth
+        ground_truth = np.load(os.path.join(DATATYPES[i], "points", "6.npy"))
+        
+        # Vẽ keypoints và ground truth lên ảnh
+        image = draw_points(image, [(kp.pt[1], kp.pt[0]) for kp in keypoints], (255, 0, 0), 1, 1, 5)
+        image = draw_points(image, ground_truth, (0, 255, 0))
+        
+        # Điều chỉnh chỉ số cột để không bị thiếu
+        col_index = i if i < 2 else (i - 1 if i < 3 else i - 2)
+        sift_columns[col_index].image(image, use_column_width=True)
+
+    st.markdown("###### Keypoints do ORB phát hiện")
+    orb_columns  = st.columns(5)
+
+    for i in range(8):
+        if  i == 2 or i == 3 or i == 7 : 
+            continue  
+        image = cv2.imread(os.path.join(DATATYPES[i], "images", "6.png"))
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        keypoints = orb.detect(gray, None)
+
+        ground_truth = np.load(os.path.join(DATATYPES[i], "points", "6.npy"))
+        image = draw_points(
+            image, [(kp.pt[1], kp.pt[0]) for kp in keypoints], (255, 0, 0), 1,1,5
+        )
+        image = draw_points(image, ground_truth, (0, 255, 0))
+
+        caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
+
+        col_index = i if i < 2 else (i - 1 if i < 3 else i - 2)
+        orb_columns[col_index].image(image, use_column_width=True)
+       
+
+        # Tạo caption cho ảnh
+        caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
+        orb_columns[col_index].markdown(f"<div style='text-align: center; font-weight: bold;'>{caption}</div>", unsafe_allow_html=True)
+
+
+    st.markdown("""
+                
+    - Ngược lại, **SIFT** tỏ ra nổi bật hơn trong việc nhận diện các hình dạng đơn giản như **stripes** và **lines**. 
+        - Điều này có thể được lý giải bởi việc SIFT được thiết kế để phát hiện các đặc trưng trên hình ảnh có độ biến dạng lớn và 
+    thường là những đặc trưng có độ bền cao hơn, như các đường thẳng và các họa tiết lặp lại. 
+        - Kết quả này cho thấy SIFT vẫn là một công cụ hữu ích trong các tình huống cụ thể, 
+    đặc biệt là khi xử lý hình ảnh có tính chất đơn giản và rõ ràng hơn.
+""")
+  
+    col1,col2 = st.columns(2)
+    with col1:
+        st.markdown("###### Keypoints do SIFT phát hiện")
+        sift_columns = st.columns(2)
+        for i in [3, 7]:
+            image_sift = process_image(DATATYPES, i, sift)
+            
+            col_index = (i - 3) // 4  # Điều chỉnh chỉ số cột
+            sift_columns[col_index].image(image_sift, use_column_width=True)
+            caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
+            sift_columns[col_index].markdown(f"<div style='text-align: center; font-weight: bold;'>{caption}</div>", unsafe_allow_html=True)
+    with col2:
+        st.markdown("###### Keypoints do SIFT phát hiện")
+
+        orb_columns = st.columns(2)
+        for i in [3, 7]:
+            image_orb= process_image(DATATYPES, i, orb)
+            
+            col_index = (i - 3) // 4  # Điều chỉnh chỉ số cột
+            orb_columns[col_index].image(image_orb, use_column_width=True)
+            caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
+            orb_columns[col_index].markdown(f"<div style='text-align: center; font-weight: bold;'>{caption}</div>", unsafe_allow_html=True)
+
+    st.markdown("""
+        - Việc **ORB** cho kết quả cao hơn trong các hình dạng phức tạp cho thấy ưu điểm của nó trong việc tối ưu hóa tốc độ và độ chính xác, 
+                điều này là một lợi thế lớn trong các ứng dụng thời gian thực. 
+                ORB sử dụng các phương pháp đơn giản hơn để phát hiện các điểm đặc trưng, giúp nó hoạt động hiệu quả hơn trên các hình ảnh có nhiều chi tiết và cấu trúc phức tạp.
+        - Trong khi đó, **SIFT** mặc dù có độ chính xác cao trong các tình huống cụ thể, 
+                nhưng lại yêu cầu nhiều tài nguyên tính toán hơn, làm cho nó không phù hợp với các ứng dụng cần xử lý nhanh. 
+                SIFT cũng thường bị ảnh hưởng bởi các yếu tố như ánh sáng và sự biến dạng trong hình ảnh, 
+                điều này có thể làm giảm hiệu suất trong những trường hợp cụ thể.
+        - Việc lựa chọn phương pháp nào sẽ phụ thuộc vào mục tiêu cụ thể của bài toán. 
+                Nếu bài toán yêu cầu phát hiện các hình dạng phức tạp và có nhiều chi tiết, **ORB** có thể là lựa chọn tối ưu. 
+                Tuy nhiên, nếu bài toán tập trung vào các đặc trưng rõ ràng và đơn giản, **SIFT** vẫn có thể là một công cụ đáng tin cậy.
+
+""")
 display_methods()
 display_metric()
 display_results()
+display_discussion()
