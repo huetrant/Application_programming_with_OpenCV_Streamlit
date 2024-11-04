@@ -273,7 +273,7 @@ def display_results():
         precision_df = pd.DataFrame(
             {
                 "shape_type": [
-                    DATATYPES[i].split("\\")[-1].replace("draw_", "")
+                    DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
                     for i in range(len(DATATYPES))
                 ],
                 "SIFT": avg_precision_sift,
@@ -300,7 +300,7 @@ def display_results():
         recall_df = pd.DataFrame(
             {
                 "shape_type": [
-                    DATATYPES[i].split("\\")[-1].replace("draw_", "")
+                    DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
                     for i in range(len(DATATYPES))
                 ],
                 "SIFT": avg_recall_sift,
