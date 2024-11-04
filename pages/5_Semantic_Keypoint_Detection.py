@@ -399,7 +399,7 @@ def display_discussion():
             caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
             sift_columns[col_index].markdown(f"<div style='text-align: center; font-weight: bold;'>{caption}</div>", unsafe_allow_html=True)
     with col2:
-        st.markdown("###### Keypoints do SIFT phát hiện")
+        st.markdown("###### Keypoints do ORB phát hiện")
 
         orb_columns = st.columns(2)
         for i in [3, 7]:
