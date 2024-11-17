@@ -292,7 +292,19 @@ def display_result():
     
 def display_discussion():
     st.header("4. Thảo luận")
-    
+    st.markdown("""
+    - **Góc nhỏ (0° - 30°): độ chính xác của cả 3 thuật toán đều khá cao**
+        - **SuperPoint** đạt độ chính xác cao nhất (>0.5) nhờ sử dụng mạng nơ-ron sâu, giúp phát hiện và mô tả keypoint rất chính xác trong điều kiện góc xoay nhỏ, nơi biến dạng ít xảy ra.
+        - **ORB** và **SIFT** cũng đạt hiệu suất cao, nhưng thấp hơn SuperPoint do đặc trưng của các thuật toán truyền thống. ORB sử dụng bộ mô tả BRIEF với khả năng kháng xoay cơ bản, còn SIFT dựa trên histogram định hướng giúp mô tả keypoint tốt trong điều kiện ít biến dạng.
+    - **Góc trung bình (40° - 180°): độ chính xác của cả 3 thuật toán tương đối thấp**
+        - **ORB** vượt trội và duy trì hiệu suất ổn định hơn cả. Điều này nhờ vào khả năng kháng góc xoay của ORB thông qua việc chuẩn hóa hướng chính (dominant orientation) của keypoint. Dù BRIEF không mạnh mẽ như các mô tả học sâu, nhưng tính đơn giản của thuật toán giúp ORB hoạt động nhất quán.
+        - **SIFT** giảm hiệu suất khi góc xoay tăng, do histogram định hướng không đủ linh hoạt để mô tả đặc trưng trong các góc xoay lớn hơn 90°.
+        - **SuperPoint** giảm đáng kể ở một số góc xoay trung bình. Điều này có thể do dữ liệu huấn luyện không bao quát đủ các biến đổi phức tạp, dẫn đến mạng không tổng quát hóa tốt trong điều kiện này.
+    - **Kết luận**:
+        - **ORB** là phương pháp phù hợp nhất nếu yêu cầu tính ổn định cao trên toàn bộ phạm vi góc xoay, đặc biệt trong các ứng dụng thời gian thực và tài nguyên hạn chế.
+        - **SuperPoint** mạnh mẽ hơn ở góc nhỏ nhưng cần cải thiện khả năng kháng biến đổi ở các góc trung bình.
+        - **SIFT** vẫn là lựa chọn tốt trong các bài toán không yêu cầu xử lý góc xoay lớn, nhưng không phù hợp khi góc xoay vượt quá 90°. 
+    """)
 
 
 display_methods()
