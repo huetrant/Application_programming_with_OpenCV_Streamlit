@@ -81,7 +81,7 @@ def display_methods():
         """)
 
   with col2:
-      st.image(".\data\matching_keypoint\superpoint.png", caption='Kiến trúc mô hình SuperPoint', use_column_width=True)
+      st.image("./data/matching_keypoint/superpoint.png", caption='Kiến trúc mô hình SuperPoint', use_column_width=True)
   
   
 
