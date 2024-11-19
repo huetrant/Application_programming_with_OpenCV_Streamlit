@@ -38,7 +38,6 @@ def extract_features_superpoint(image, model = superpoint):
         return None
     return descriptors.T  
 
-@st.cache_resource
 # Hàm tải codebook và TF-IDF matrix
 def load_codebook_and_tfidf(k):
     codebook_path = os.path.join(Instrance_Model_DIR, f"codebook{k}.pkl")
@@ -52,7 +51,6 @@ def load_codebook_and_tfidf(k):
     return codebook, tfidf_matrix
 
 # Hàm tải chỉ số và tên ảnh
-@st.cache_resource
 def load_image_index():
     index_path = os.path.join(Instrance_Model_DIR, "image_index_to_filename.pkl")
     with open(index_path, "rb") as f:
