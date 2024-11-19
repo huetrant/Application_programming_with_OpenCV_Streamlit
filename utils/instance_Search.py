@@ -27,7 +27,7 @@ def preprocess_image(image):
     return image
 
 # Trích xuất đặc trưng sử dụng SuperPoint
-@st.cache_resource
+
 def extract_features_superpoint(image, model = superpoint):
     image = preprocess_image(image)
     _, descriptors, _ = model.run(image)
