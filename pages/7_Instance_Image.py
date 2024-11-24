@@ -109,19 +109,16 @@ def display_method():
 def display_app():
   st.header("3. Ứng dụng")
 
-  col1, col2, col3 = st.columns(3)
+  col1, col2= st.columns(2)
 
   with col1:
       uploaded_file = st.file_uploader("Vui lòng tải lên ảnh cần tìm kiếm", type=["jpg", "jpeg", "png"])
 
   with col2:
-      k = st.selectbox("Chọn số lượng cluster", [50, 100, 150, 200, 250, 300], index=2)
-
-  with col3:
       num_results = st.slider("Chọn số lượng ảnh trả về", min_value=1, max_value=50, value=5, step = 1)
 
 # Tải codebook và tf-idf matrix
-  codebook, tfidf_matrix = load_codebook_and_tfidf(k)
+  codebook, tfidf_matrix = load_codebook_and_tfidf(150)
   image_index_to_filename = load_image_index()
 
   if uploaded_file:

@@ -10,3 +10,4 @@ scipy
 PyQt6
 torch
 tqdm
+redis

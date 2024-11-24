@@ -135,7 +135,8 @@ def display_experiment():
     st.write("""
     1. **Dataset**: Sử dụng tập **Synthetic Shapes Dataset** gồm **7** loại hình học,
               mỗi loại hình học gồm **500** ảnh. Tổng **3500** ảnh mẫu với kích thước $160$ x $120$ pixels.
-    2. Đánh giá mức độ **Matching Keypoint** với **SIFT**, **ORB** và **SuperPoint** 
+    2. **Keypoint groundtruth** được sử dụng để đánh giá mức độ matching của 3 thuật toán **SIFT**, **ORB** và **SuperPoint**.
+    3. Đánh giá mức độ **Matching Keypoint** với **SIFT**, **ORB** và **SuperPoint** 
         trên các **góc xoay ảnh** với các góc xoay từ $0\degree$ đến $350\degree$ với mỗi bước nhảy là $10\degree$
     """)
     # Tạo hai cột

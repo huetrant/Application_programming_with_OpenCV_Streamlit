@@ -289,6 +289,7 @@ def display_results():
             horizontal=True,
             color=["#2ECC71", "#F39C12"],
         )
+    st.subheader("Nhận xét:")
 
 @st.fragment()
 def display_discussion():

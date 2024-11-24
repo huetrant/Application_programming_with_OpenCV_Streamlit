@@ -19,45 +19,60 @@ st.title(
 DATA_DIR ="./data/object_tracking/"
 def display_method():
   st.header("1. Thuật toán CSRT - Channel and Spatial Reliability Tracker")
-  st.subheader("1.1. Cơ sở lý thuyết của CSRT")
+  st.subheader("1.1. Giới thiệu")
   st.write("""
-  - **Channel and Spatial Reliability**
-    - **Channel Reliability:** CSRT tận dụng thông tin từ các kênh màu (RGB hoặc chuyển đổi) để xử lý sự thay đổi về ánh sáng, 
-  giúp tăng độ chính xác trong theo dõi đối tượng ngay cả khi điều kiện chiếu sáng thay đổi.        
-    - **Spatial Reliability**: Để đối phó với occlusion và non-rigid deformations, CSRT dự đoán chuyển động dựa trên mối liên hệ với các khung hình trước, 
-  đảm bảo theo dõi ổn định khi đối tượng bị che khuất hoặc thay đổi hình dạng.
-  - **Discriminative Correlation Filter (DCF):**  CSRT sử dụng DCF để định vị và ước lượng hình dạng đối tượng. Bộ lọc được huấn luyện từ các mẫu tích cực (đối tượng) và tiêu cực (nền, nhiễu) 
-  và được cập nhật liên tục trong quá trình theo dõi.
+  [**Thuật toán CSRT** (Discriminative Correlation Filter with Channel and Spatial Reliability)](https://openaccess.thecvf.com/content_cvpr_2017/papers/Lukezic_Discriminative_Correlation_Filter_CVPR_2017_paper.pdf)
+           được Alan Lukežič, Tomáš Vojı́ř, Luka Čehovin Zajc, Jiřı́ Matas và Matej Kristan giới thiệu là một cải tiến 
+  của bộ lọc tương quan phân biệt (DCF), được thiết kế để theo dõi đối tượng hiệu quả trong các tình huống phức tạp 
+  như che khuất, biến đổi hình dạng và nhiễu từ nền. Thuật toán này kết hợp hai khái niệm chính: 
+  **độ tin cậy không gian** và **độ tin cậy kênh**, nhằm cải thiện độ chính xác và tính ổn định của quá trình theo dõi.
   """)
 
 
   # Implementation Steps
   st.subheader("1.2. Các bước thực hiện")
-  col1, col2 = st.columns(2)
-  with col1:
-    st.write("""
-        - **Sample Generation**
-          - **Positive/Negative Samples**: Thu thập mẫu tích cực (đối tượng) và tiêu cực (nền/nhiễu) để huấn luyện.
-          - **Feature Extraction**: Sử dụng HOG, SIFT hoặc đặc trưng tương tự để trích xuất thông tin từ các mẫu.
-            
-        - **Training**
-          - **Kernel Matrix**: Xây dựng ma trận nhân (ví dụ Gaussian) từ các đặc trưng trích xuất.
-          - **Desired Response**: Tạo phản hồi mong muốn, thường là đỉnh Gaussian tại trung tâm đối tượng.
-             
-        - **Learning the Filter**
-          - **Ridge Regression**:  CSRT áp dụng kỹ thuật ridge regression (hồi quy rìa) để học bộ lọc tương quan, giảm sai số giữa phản hồi thực tế và mong muốn, cải thiện độ chính xác.
-        
-        - **Tracking**
-          - **Feature Extraction**: Tiếp tục trích xuất đặc trưng từ khung hình mới.
-          - **Correlation Filtering**: Dùng bộ lọc tương quan đã học được áp dụng lên các khung hình mới và tạo ra bản đồ phản hồi. Đỉnh của bản đồ này cho biết vị trí có xác suất cao nhất của đối tượng.
-          - **Locate the Target**: CSRT tìm kiếm đỉnh cao nhất trong bản đồ phản hồi để xác định vị trí của đối tượng trong khung hình hiện tại.
-    """)
-    with col2:
-      img = Image.open(os.path.join(DATA_DIR, "flowchart.png"))
-      st.columns([1, 2, 1])[1].image(
-          img,
-          caption="CSRT Flowchart",
-      )
+  st.subheader("1.2.1. Xây dựng bản đồ độ tin cậy không gian")
+  st.write("""
+  Bản đồ độ tin cậy không gian xác định các pixel đáng tin cậy trên đối tượng để học và theo dõi.
+  **Quy trình:**
+  - **Tính xác suất pixel thuộc foreground:**
+    - Dựa trên mô hình màu foreground/background.
+    - Áp dụng định lý Bayes
+  - **Tăng cường tính nhất quán không gian:** Áp dụng thuật toán Markov Random Field để làm mịn phân vùng.
+  - **Xử lý biên:** Thực hiện giãn nở hình thái học (morphological dilation) để giữ lại các pixel quan trọng ở biên đối tượng.
+  """)
+
+  # 2. Học bộ lọc tương quan
+  st.subheader("1.2.2. Học bộ lọc tương quan có ràng buộc không gian")
+  st.write("""
+  Bản đồ độ tin cậy không gian được sử dụng trong quá trình học bộ lọc tương quan để chỉ học từ các vùng đáng tin cậy.
+  **Quy trình tối ưu hóa:**
+  - Sử dụng phương pháp **Augmented Lagrangian** và thuật toán **ADMM** để giải bài toán tối ưu hóa:
+    - Cập nhật biến kép dựa trên ràng buộc không gian.
+    - Cập nhật bộ lọc tương quan qua phép biến đổi Fourier nghịch.
+    - Cập nhật nhân tử Lagrange.
+  - Hầu hết các phép tính được thực hiện trong miền tần số (frequency domain) để tăng tốc độ.
+  """)
+
+  # 3. Đánh giá độ tin cậy kênh
+  st.subheader("1.2.3. Đánh giá độ tin cậy kênh")
+  st.write("""
+  Mỗi kênh đặc trưng được đánh giá độ tin cậy trong hai giai đoạn:
+  - **Trong quá trình học:** Đo lường sức mạnh phân biệt dựa trên phản hồi cực đại.
+  - **Trong quá trình định vị:** Đánh giá mức độ rõ ràng của đỉnh phản hồi để tránh nhiễu từ các đối tượng gần đối tượng mục tiêu.
+  """)
+
+  # 4. Quy trình theo dõi
+  st.subheader("1.2.4. Quy trình theo dõi đối tượng")
+  st.write("""
+  - **Xác định vị trí:**
+    - Tính phản hồi trên từng kênh.
+    - Trọng số hóa phản hồi và xác định vị trí đỉnh tương ứng với đối tượng.
+  - **Cập nhật:**
+    - Cập nhật mô hình màu.
+    - Xây dựng lại bản đồ độ tin cậy không gian.
+    - Tính bộ lọc mới và cập nhật trọng số độ tin cậy kênh.
+  """)
   # Practical Considerations
  
 
