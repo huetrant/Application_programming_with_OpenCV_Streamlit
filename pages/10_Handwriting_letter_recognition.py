@@ -116,7 +116,7 @@ def display_model():
 
     # Hiển thị ảnh trong mỗi cột
     with col1:
-        st.image(image1,  use_column_width=True)
+        st.image(image1,  use_container_width =True)
         st.write(
         """
         - **Convolutional Layer**: lớp tích chập dùng để trích xuất các đặc trưng của ảnh.
@@ -135,7 +135,7 @@ def display_model():
     )
 
     with col2:
-        st.image(image2, use_column_width=True)
+        st.image(image2, use_container_width =True)
 
 def display_result():
     st.markdown("""
@@ -173,7 +173,7 @@ def display_result():
     with col2:
       st.markdown('<div class="center-text"><strong>Ma trận nhầm lẫn</strong></div>', unsafe_allow_html=True)
       image = Image.open('./data/handwriting_letter_recognition/confusion_matrix.png')
-      st.image(image,  use_column_width=True)
+      st.image(image,  use_container_width =True)
 
 def display_app():
     st.header("4. Ứng dụng")
