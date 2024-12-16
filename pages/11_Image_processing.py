@@ -89,7 +89,7 @@ def main():
         transformed_image = None
 
         if option == "Lật ảnh (Flip)":
-            flip_code = st.radio("Kiểu lật:", ("Chiều ngang", "Chiều dọc", "Cả hai"),horizontal=True)
+            flip_code = st.radio("Kiểu lật:", ("Chiều ngang", "Chiều dọc", "Cả hai"), horizontal=True)
             flip_map = {"Chiều ngang": 1, "Chiều dọc": 0, "Cả hai": -1}
             if st.button("Áp dụng lật ảnh"):
                 transformed_image = flip_image(image, flip_map[flip_code])
@@ -100,7 +100,7 @@ def main():
                 transformed_image = rotate_image(image, angle)
 
         elif option == "Chuyển đổi không gian màu (Convert Colorspace)":
-            colorspace = st.radio("Không gian màu:", ("Grayscale", "HSV", "LAB", "RGB", "XYZ", "YUV", "HLS", "Luv", "YCrCb"),horizontal=True)
+            colorspace = st.radio("Không gian màu:", ("Grayscale", "HSV", "LAB", "RGB", "XYZ", "YUV", "HLS", "Luv", "YCrCb"), horizontal=True)
             color_map = {
                 "Grayscale": cv2.COLOR_BGR2GRAY,
                 "HSV": cv2.COLOR_BGR2HSV,
@@ -116,52 +116,58 @@ def main():
                 transformed_image = convert_colorspace(image, color_map[colorspace])
 
         elif option == "Dịch chuyển (Translate)":
-            # Giới hạn giá trị dịch chuyển theo chiều rộng và chiều cao của ảnh
-            max_x_shift = image.shape[1]  # Chiều rộng ảnh
-            max_y_shift = image.shape[0]  # Chiều cao ảnh
-
+            max_x_shift = image.shape[1]
+            max_y_shift = image.shape[0]
             x_shift = st.slider("Dịch chuyển theo trục X (pixel):", -max_x_shift, max_x_shift, 0)
             y_shift = st.slider("Dịch chuyển theo trục Y (pixel):", -max_y_shift, max_y_shift, 0)
-
             if st.button("Áp dụng dịch chuyển"):
                 transformed_image = translate_image(image, x_shift, y_shift)
-                
 
+        if option == "Cắt ảnh (Crop)":
+            col1, col2 = st.columns(2)
+            with col1:
+            # Sử dụng canvas để vẽ vùng cần cắt
+                canvas_result = st_canvas(
+                    fill_color="rgba(255, 165, 0, 0.3)",  # Màu nền
+                    stroke_width=2,
+                    stroke_color="rgba(255, 0, 0, 0.5)",  # Màu viền
+                    background_image=pil_image,  # Ảnh gốc làm nền
+                    width=image.shape[1],
+                    height=image.shape[0],
+                    drawing_mode="rect",  # Chế độ vẽ hình chữ nhật
+                    key="canvas",
+                )
 
-        elif option == "Cắt ảnh (Crop)":
-            # Chỉ hiển thị ảnh gốc và cho phép vẽ vùng cắt
-            st.markdown("### Vẽ vùng cần cắt:")
-            canvas_result = st_canvas(
-                fill_color="rgba(255, 165, 0, 0.3)",  # Màu nền cho vùng vẽ
-                stroke_width=2,
-                stroke_color="rgba(255, 0, 0, 0.5)",  # Màu viền vùng vẽ
-                background_image=pil_image,  # Chuyển đổi ảnh gốc sang PIL và sử dụng làm nền
-                width=image.shape[1],
-                height=image.shape[0],
-                drawing_mode="rect",  # Chế độ vẽ hình chữ nhật
-                key="canvas",
-            )
-
-            # Khi người dùng nhấn Submit, lấy vùng cắt và thực hiện
-            if st.button("Submit"):
+            # Khi người dùng nhấn nút "Cắt ảnh"
+            if st.button("Áp dung cắt ảnh"):
                 if canvas_result.json_data is not None:
                     objects = canvas_result.json_data["objects"]
                     if objects:
-                        # Lấy thông tin vùng cắt
+                        # Lấy thông tin vùng cắt từ canvas
                         x_start = int(objects[0]["left"])
                         y_start = int(objects[0]["top"])
                         width = int(objects[0]["width"])
                         height = int(objects[0]["height"])
+                        
+                        # Cắt ảnh
+                        cropped_image = crop_image(image, x_start, y_start, width, height)
 
-                        # Cắt ảnh theo vùng vẽ
-                        transformed_image = crop_image(image, x_start, y_start, width, height)
+                        # Hiển thị canvas và ảnh kết quả song song
+                  
+                else:
+                    st.warning("Hãy vẽ một vùng trên canvas trước khi nhấn cắt ảnh!")
+                with col2:
+                    st.image(cropped_image, caption="Ảnh sau khi cắt")
+            
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.image(image, caption="Ảnh gốc")
-        if transformed_image is not None:
-            with col2:
-                st.image(transformed_image, caption="Ảnh kết quả")
+        # Hiển thị ảnh gốc nếu không phải chức năng Crop
+        if option != "Cắt ảnh (Crop)":
+            col1, col2 = st.columns(2)
+            with col1:
+                st.image(image, caption="Ảnh gốc")
+            if transformed_image is not None:
+                with col2:
+                    st.image(transformed_image, caption="Ảnh kết quả")
 
 if __name__ == "__main__":
     main()
