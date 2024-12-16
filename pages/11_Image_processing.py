@@ -46,13 +46,13 @@ def crop_image(image, start_x, start_y, width, height):
     return image[start_y:start_y+height, start_x:start_x+width]
 
 def main():
-    col1, col2 = st.columns(2)
+    
     st.markdown(
             """
-            ### Chào mừng đến với Ứng dụng xử lý ảnh!
             Công cụ này cho phép bạn tải lên một hình ảnh và áp dụng các kỹ thuật xử lý ảnh khác nhau.
             """
-        )
+    )
+    col1, col2 = st.columns(2)
     with col1:
         st.markdown(
             """
@@ -81,6 +81,7 @@ def main():
 
     if uploaded_file is not None:
         image = np.array(Image.open(uploaded_file))
+        pil_image = Image.open(uploaded_file)
 
         col1, col2 = st.columns(2)
         with col1:
@@ -112,18 +113,12 @@ def main():
                     transformed_image = convert_colorspace(image, color_map[colorspace])
 
         elif option == "Dịch chuyển (Translate)":
-            # Hướng dẫn người dùng về giá trị dương và âm cho dịch chuyển
-            x_shift = st.text_input("Dịch chuyển theo trục X (pixel):\n(Dương để dịch chuyển sang phải, Âm để dịch chuyển sang trái)", "0")
-            y_shift = st.text_input("Dịch chuyển theo trục Y (pixel):\n(Dương để dịch chuyển xuống dưới, Âm để dịch chuyển lên trên)", "0")
+            # Giới hạn giá trị dịch chuyển theo chiều rộng và chiều cao của ảnh
+            max_x_shift = image.shape[1]  # Chiều rộng ảnh
+            max_y_shift = image.shape[0]  # Chiều cao ảnh
 
-            # Kiểm tra giá trị nhập vào và chuyển đổi sang số nguyên
-            try:
-                x_shift = int(x_shift)
-                y_shift = int(y_shift)
-            except ValueError:
-                st.error("Vui lòng nhập giá trị hợp lệ cho dịch chuyển (số nguyên).")
-                x_shift = 0
-                y_shift = 0
+            x_shift = st.slider("Dịch chuyển theo trục X (pixel):", -max_x_shift, max_x_shift, 0)
+            y_shift = st.slider("Dịch chuyển theo trục Y (pixel):", -max_y_shift, max_y_shift, 0)
 
             if st.button("Áp dụng dịch chuyển"):
                 transformed_image = translate_image(image, x_shift, y_shift)
@@ -131,31 +126,32 @@ def main():
 
 
         elif option == "Cắt ảnh (Crop)":
-            # Sử dụng canvas để vẽ vùng cần cắt
+            # Chỉ hiển thị ảnh gốc và cho phép vẽ vùng cắt
             st.markdown("### Vẽ vùng cần cắt:")
             canvas_result = st_canvas(
                 fill_color="rgba(255, 165, 0, 0.3)",  # Màu nền cho vùng vẽ
                 stroke_width=2,
                 stroke_color="rgba(255, 0, 0, 0.5)",  # Màu viền vùng vẽ
-                background_color="white",
+                background_image=pil_image,  # Chuyển đổi ảnh gốc sang PIL và sử dụng làm nền
                 width=image.shape[1],
                 height=image.shape[0],
                 drawing_mode="rect",  # Chế độ vẽ hình chữ nhật
                 key="canvas",
             )
 
-            # Kiểm tra nếu người dùng đã vẽ vùng cắt
-            if canvas_result.json_data is not None:
-                objects = canvas_result.json_data["objects"]
-                if objects:
-                    # Lấy thông tin vùng cắt
-                    x_start = int(objects[0]["left"])
-                    y_start = int(objects[0]["top"])
-                    width = int(objects[0]["width"])
-                    height = int(objects[0]["height"])
+            # Khi người dùng nhấn Submit, lấy vùng cắt và thực hiện
+            if st.button("Submit"):
+                if canvas_result.json_data is not None:
+                    objects = canvas_result.json_data["objects"]
+                    if objects:
+                        # Lấy thông tin vùng cắt
+                        x_start = int(objects[0]["left"])
+                        y_start = int(objects[0]["top"])
+                        width = int(objects[0]["width"])
+                        height = int(objects[0]["height"])
 
-                    # Cắt ảnh theo vùng vẽ
-                    transformed_image = crop_image(image, x_start, y_start, width, height)
+                        # Cắt ảnh theo vùng vẽ
+                        transformed_image = crop_image(image, x_start, y_start, width, height)
 
 
         if transformed_image is not None:
