@@ -83,17 +83,13 @@ def main():
         image = np.array(Image.open(uploaded_file))
         pil_image = Image.open(uploaded_file)
 
-        col1, col2 = st.columns(2)
-        with col1:
-            st.image(image, caption="Ảnh gốc")
-
-        option = st.selectbox("Chọn chức năng:",
+        option = st.selectbox("Chọn chức năng:", 
                              ["Lật ảnh (Flip)", "Xoay ảnh (Rotate)", "Chuyển đổi không gian màu (Convert Colorspace)", "Dịch chuyển (Translate)", "Cắt ảnh (Crop)"])
 
         transformed_image = None
 
         if option == "Lật ảnh (Flip)":
-            flip_code = st.radio("Kiểu lật:", ("Chiều ngang", "Chiều dọc", "Cả hai"))
+            flip_code = st.radio("Kiểu lật:", ("Chiều ngang", "Chiều dọc", "Cả hai"),horizontal=True)
             flip_map = {"Chiều ngang": 1, "Chiều dọc": 0, "Cả hai": -1}
             if st.button("Áp dụng lật ảnh"):
                 transformed_image = flip_image(image, flip_map[flip_code])
@@ -104,13 +100,20 @@ def main():
                 transformed_image = rotate_image(image, angle)
 
         elif option == "Chuyển đổi không gian màu (Convert Colorspace)":
-            colorspace = st.radio("Không gian màu:", ("Grayscale", "HSV", "LAB"))
-            color_map = {"Grayscale": cv2.COLOR_BGR2GRAY, "HSV": cv2.COLOR_BGR2HSV, "LAB": cv2.COLOR_BGR2LAB}
+            colorspace = st.radio("Không gian màu:", ("Grayscale", "HSV", "LAB", "RGB", "XYZ", "YUV", "HLS", "Luv", "YCrCb"),horizontal=True)
+            color_map = {
+                "Grayscale": cv2.COLOR_BGR2GRAY,
+                "HSV": cv2.COLOR_BGR2HSV,
+                "LAB": cv2.COLOR_BGR2LAB,
+                "RGB": cv2.COLOR_BGR2RGB,
+                "XYZ": cv2.COLOR_BGR2XYZ,
+                "YUV": cv2.COLOR_BGR2YUV,
+                "HLS": cv2.COLOR_BGR2HLS,
+                "Luv": cv2.COLOR_BGR2LUV,
+                "YCrCb": cv2.COLOR_BGR2YCrCb
+            }
             if st.button("Áp dụng chuyển đổi màu"):
-                if colorspace == "Grayscale":
-                    transformed_image = convert_colorspace(image, color_map[colorspace])
-                else:
-                    transformed_image = convert_colorspace(image, color_map[colorspace])
+                transformed_image = convert_colorspace(image, color_map[colorspace])
 
         elif option == "Dịch chuyển (Translate)":
             # Giới hạn giá trị dịch chuyển theo chiều rộng và chiều cao của ảnh
@@ -153,7 +156,9 @@ def main():
                         # Cắt ảnh theo vùng vẽ
                         transformed_image = crop_image(image, x_start, y_start, width, height)
 
-
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image(image, caption="Ảnh gốc")
         if transformed_image is not None:
             with col2:
                 st.image(transformed_image, caption="Ảnh kết quả")
