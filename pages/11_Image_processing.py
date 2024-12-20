@@ -31,15 +31,11 @@ def convert_colorspace(image, conversion_code):
     return cv2.cvtColor(image, conversion_code)
 
 def translate_image(image, x_shift, y_shift):
-    """Translate the image and crop it to remove the shifted parts."""
-    (h, w) = image.shape[:2]
+    """Translate the image."""
     matrix = np.float32([[1, 0, x_shift], [0, 1, y_shift]])
-    translated_image = cv2.warpAffine(image, matrix, (w, h))
-    x_start = max(0, x_shift)
-    y_start = max(0, y_shift)
-    x_end = w - max(0, -x_shift)
-    y_end = h - max(0, -y_shift)
-    return translated_image[y_start:y_end, x_start:x_end]
+    (h, w) = image.shape[:2]
+    return cv2.warpAffine(image, matrix, (w, h))
+
 
 def crop_image(image, start_x, start_y, width, height):
     """Crop the image."""
