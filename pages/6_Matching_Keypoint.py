@@ -81,7 +81,7 @@ def display_methods():
         """)
 
   with col2:
-      st.image("./data/matching_keypoint/superpoint.png", caption='Kiến trúc mô hình SuperPoint', use_column_width=True)
+      st.image("./data/matching_keypoint/superpoint.png", caption='Kiến trúc mô hình SuperPoint',  use_container_width=True)
   
   
 
@@ -116,7 +116,7 @@ def display_methods():
       caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
       cols[i % 4].image(
           image,
-          use_column_width=True,  
+           use_container_width=True,  
       )
       cols[i % 4].markdown(f"<div style='text-align: center; font-weight: bold;'>{caption}</div>", unsafe_allow_html=True)
       # Chuyển sang cột mới sau mỗi 4 ảnh
@@ -287,7 +287,7 @@ def display_result():
             cols[i].image(
                 matched_image,
                 caption=caption,
-                use_column_width=True
+                 use_container_width=True
             )
 
     

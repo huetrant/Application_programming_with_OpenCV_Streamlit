@@ -103,7 +103,7 @@ def display_datasets():
     for j in range(10):
         _img_path = os.path.join(__DATA_DIR, "train/positives", positive_images_name[10 + j])
         _image = cv2.imread(_img_path)
-        _cols[j].image(_image, use_column_width=True)
+        _cols[j].image(_image,  use_container_width=True)
 
     # Hiển thị dòng tiêu đề cho 10 ảnh không chứa khuôn mặt
     st.write("$10$ ảnh không chứa khuôn mặt")
@@ -113,7 +113,7 @@ def display_datasets():
     for j in range(10):
         _img_path = os.path.join(__DATA_DIR, "train/negatives", negative_images_name[10+j])
         _image = cv2.imread(_img_path)
-        _cols[j].image(_image, use_column_width=True, channels="BGR")
+        _cols[j].image(_image,  use_container_width=True, channels="BGR")
 
 
     st.subheader("1.2. Tập Test")
@@ -133,7 +133,7 @@ def display_datasets():
             if index < len(test_images_name):  # Kiểm tra để tránh lỗi nếu không có đủ ảnh
                 _img_path = os.path.join(test_images_path, test_images_name[index])
                 _image = cv2.imread(_img_path)
-                _cols[j].image(_image, use_column_width=True, channels="BGR")
+                _cols[j].image(_image,  use_container_width=True, channels="BGR")
 
 def display_training():
     st.header("2. Quá trình huấn luyện")
@@ -168,7 +168,7 @@ def display_training():
     st.columns(3)[1].image(
         os.path.join("./images/IoU.webp"),
 
-        use_column_width=True,
+         use_container_width=True,
         caption="Công thức IoU",
     )
     st.write(
@@ -220,7 +220,7 @@ def display_training():
                     img_ground_truth = cv2.imread(ground_truth_image_path)
 
                     if img_ground_truth is not None:
-                        cols_gt[j].image(img_ground_truth, caption=f"Ground Truth {i + j + 1}", use_column_width=True, channels="BGR")
+                        cols_gt[j].image(img_ground_truth, caption=f"Ground Truth {i + j + 1}",  use_container_width=True, channels="BGR")
 
             # Hiển thị 5 ảnh Kết Quả
             cols_result = st.columns(5)  # 5 cột cho 5 ảnh kết quả
@@ -235,7 +235,7 @@ def display_training():
                         iou_value = iou_values.get(image_name, "N/A")  # Lấy IoU, nếu không có thì để là "N/A"
                         
                         # Hiển thị ảnh kết quả với IoU
-                        cols_result[j].image(img_result, caption=f"Predict {i + j + 1} - IoU: {iou_value:.4f}", use_column_width=True, channels="BGR")
+                        cols_result[j].image(img_result, caption=f"Predict {i + j + 1} - IoU: {iou_value:.4f}",  use_container_width=True, channels="BGR")
 
 
     display_result_test()

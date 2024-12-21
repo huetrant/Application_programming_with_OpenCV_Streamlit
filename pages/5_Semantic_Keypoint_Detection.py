@@ -60,7 +60,7 @@ def display_datasets():
         points = np.load(os.path.join(DATATYPES[i], "points", "6.npy"))
         image = cv2.imread(os.path.join(DATATYPES[i], "images", "6.png"))
         # Hiển thị ảnh
-        cols1[i].image(draw_points(image, points,(0, 255, 0), 1), use_column_width=True)
+        cols1[i].image(draw_points(image, points,(0, 255, 0), 1),  use_container_width=True)
 
         # Hiển thị caption in đậm
         caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
@@ -70,7 +70,7 @@ def display_datasets():
         points = np.load(os.path.join(DATATYPES[i + 4], "points", "6.npy"))
         image = cv2.imread(os.path.join(DATATYPES[i + 4], "images", "6.png"))
         # Hiển thị ảnh
-        cols2[i].image(draw_points(image, points, (0, 255, 0), 1),use_column_width=True)
+        cols2[i].image(draw_points(image, points, (0, 255, 0), 1), use_container_width=True)
 
         # Hiển thị caption in đậm
         caption = DATATYPES[i + 4].replace('\\', '/').split('/')[-1].replace('draw_', '')
@@ -106,7 +106,7 @@ def display_methods():
     """)
     with col2:
         st.image(
-               os.path.join(DATA_DIR, "The-flowchart-of-the-SIFT-method.png"),use_column_width=True, caption="SIFT Flowchart"
+               os.path.join(DATA_DIR, "The-flowchart-of-the-SIFT-method.png"), use_container_width=True, caption="SIFT Flowchart"
     )
   
     st.markdown("##### Minh họa **SIFT** trên Synthetic Shapes Datasets:")
@@ -119,7 +119,7 @@ def display_methods():
         caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
         cols[i % 4].image(
             image_sift,
-            use_column_width=True,  
+             use_container_width=True,  
         )
         cols[i % 4].markdown(f"<div style='text-align: center; font-weight: bold;'>{caption}</div>", unsafe_allow_html=True)
         # Chuyển sang cột mới sau mỗi 4 ảnh
@@ -164,7 +164,7 @@ def display_methods():
         img = Image.open(os.path.join(DATA_DIR, "Flowchart-of-ORB-algorithm.png"))
         st.columns([0.2, 3, 0.2])[1].image(
             img,
-            use_column_width=True,
+             use_container_width=True,
             caption="ORB Flowchart",
         )
         
@@ -178,7 +178,7 @@ def display_methods():
         caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
         cols[i % 4].image(
             image_orb,
-            use_column_width=True,  
+             use_container_width=True,  
 
         )
         cols[i % 4].markdown(f"<div style='text-align: center; font-weight: bold;'>{caption}</div>", unsafe_allow_html=True)
@@ -219,7 +219,7 @@ def display_metric():
         img = img.resize((img.width // 2, img.height // 2)) 
         st.columns([1, 2.2, 1])[1].image(
             img,
-            use_column_width=True,
+             use_container_width=True,
             caption="Công thức tính Precision và Recall",
         )
 
@@ -320,7 +320,7 @@ def display_discussion():
         col_index = i if i < 2 else (i - 1 if i < 3 else i - 2)
         pre,re = calculate_precision_recall_image(DATATYPES,i,sift)
         caption_with_metrics = f"Precision: {pre:.2f}, Recall: {re:.2f}"
-        sift_columns[col_index].image(image_sift, use_column_width=True,caption=caption_with_metrics)
+        sift_columns[col_index].image(image_sift,  use_container_width=True,caption=caption_with_metrics)
         
         caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
             
@@ -338,7 +338,7 @@ def display_discussion():
         col_index = i if i < 2 else (i - 1 if i < 3 else i - 2)
         pre,re = calculate_precision_recall_image(DATATYPES,i,orb)
         caption_with_metrics = f"Precision: {pre:.2f}, Recall: {re:.2f}"
-        orb_columns[col_index].image(image_orb, use_column_width=True,caption=caption_with_metrics)
+        orb_columns[col_index].image(image_orb,  use_container_width=True,caption=caption_with_metrics)
        
 
         # Tạo caption cho ảnh
@@ -368,7 +368,7 @@ def display_discussion():
             col_index = (i - 3) // 4  # Điều chỉnh chỉ số cột
             pre,re = calculate_precision_recall_image(DATATYPES,i,sift)
             caption_with_metrics = f"Precision: {pre:.2f}, Recall: {re:.2f}"
-            sift_columns[col_index].image(image_sift, use_column_width=True, caption=caption_with_metrics)
+            sift_columns[col_index].image(image_sift,  use_container_width=True, caption=caption_with_metrics)
            
             caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
             
@@ -383,7 +383,7 @@ def display_discussion():
             col_index = (i - 3) // 4  # Điều chỉnh chỉ số cột
             pre,re = calculate_precision_recall_image(DATATYPES,i,orb)
             caption_with_metrics = f"Precision: {pre:.2f}, Recall: {re:.2f}"
-            orb_columns[col_index].image(image_orb, use_column_width=True,caption=caption_with_metrics)
+            orb_columns[col_index].image(image_orb,  use_container_width=True,caption=caption_with_metrics)
             caption = DATATYPES[i].replace('\\', '/').split('/')[-1].replace('draw_', '')
             
             orb_columns[col_index].markdown(f"<div style='text-align: center; font-weight: bold;'>{caption}</div>", unsafe_allow_html=True)

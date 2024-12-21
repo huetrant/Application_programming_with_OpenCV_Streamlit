@@ -80,7 +80,7 @@ def display_dataset():
         cols = st.columns(len(row))  # Tạo các cột cho mỗi ảnh trong hàng
         for col, (_, row_data) in zip(cols, row.iterrows()):
             img = plt.imread(row_data['Filepath'])  # Đọc ảnh từ đường dẫn
-            col.image(img, use_column_width=True)
+            col.image(img,  use_container_width=True)
 
 def display_method():
    st.header("2. Thuật toán")
@@ -160,7 +160,7 @@ def display_app():
 
                       # Hiển thị ảnh trong từng cột
                       with cols[col_idx]:
-                          st.image(img, caption=f"Độ tương đồng = {score:.2f}", use_column_width=True)
+                          st.image(img, caption=f"Độ tương đồng = {score:.2f}",  use_container_width=True)
 
     else:
         st.write("Không thể trích xuất đặc trưng từ ảnh truy vấn. Vui lòng thử lại với ảnh khác.")
