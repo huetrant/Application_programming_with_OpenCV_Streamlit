@@ -72,13 +72,13 @@ def display_datasets():
             sub_cols[i].image(
                 train_images[i],
                 caption=f"Ảnh {i+1} của tập train",
-                use_column_width=True,
+                 use_container_width=True,
                 channels="BGR",
             )
             sub_cols[i].image(
                 train_labels[i],
                 caption=f"Ground truth ảnh {i+1} của tập train",
-                use_column_width=True,
+                 use_container_width=True,
             )
 
     with cols[1]:
@@ -89,13 +89,13 @@ def display_datasets():
             sub_cols[i].image(
                 test_images[i],
                 caption=f"Ảnh {i+1} của tập test",
-                use_column_width=True,
+                 use_container_width=True,
                 channels="BGR",
             )
             sub_cols[i].image(
                 test_labels[i],
                 caption=f"Ground truth ảnh {i+1} của tập test",
-                use_column_width=True,
+                 use_container_width=True,
             )
 
 
@@ -135,7 +135,7 @@ def display_tranning_process():
         )
         st.columns([1, 2, 1])[1].image(
             os.path.join(__DATA_DIR, "IoU.webp"),
-            use_column_width=True,
+             use_container_width=True,
             caption="Công thức IoU",
         )
 
@@ -220,7 +220,7 @@ def display_tranning_process():
                 st.image(
                     train_images[i],
                     caption=f"Ảnh {i+1} của tập train",
-                    use_column_width=True,
+                     use_container_width=True,
                     channels="BGR",
                 )
 
@@ -228,7 +228,7 @@ def display_tranning_process():
                 st.image(
                     train_labels[i],
                     caption=f"Ground truth ảnh {i+1} của tập train",
-                    use_column_width=True,
+                     use_container_width=True,
                 )
 
             with cols[2]:
@@ -277,7 +277,7 @@ def display_result():
             st.image(
                 test_images[i],
                 caption=f"Ảnh {i+1} của tập test",
-                use_column_width=True,
+                 use_container_width=True,
                 channels="BGR",
             )
 
@@ -285,7 +285,7 @@ def display_result():
             st.image(
                 test_labels[i],
                 caption=f"Ground truth ảnh {i+1} của tập test",
-                use_column_width=True,
+                 use_container_width=True,
             )
 
         with cols[2]:
@@ -300,7 +300,7 @@ def display_result():
             st.image(
                 _mask,
                 caption=f"Dụ đoán đối tượng ảnh {i+1} của tập test",
-                use_column_width=True,
+                 use_container_width=True,
             )
             _label = np.copy(test_labels[i])
             _label[_label == 255] = 1
