@@ -5,7 +5,6 @@ import joblib
 from PIL import Image
 import os
 import matplotlib.pyplot as plt
-from graphviz import Digraph
 
 st.set_page_config(
     page_title="Nhận Diện Cảm Xúc Từ Khuôn Mặt",
