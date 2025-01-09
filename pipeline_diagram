@@ -1,0 +1,15 @@
+digraph {
+	1 [label="Tải Dữ Liệu (Ảnh/ Webcam)"]
+	2 [label="Phát Hiện Khuôn Mặt
+(Haar Cascade)"]
+	3 [label="Tiền Xử Lý Ảnh
+(Grayscale + Resize)"]
+	4 [label="Dự Đoán Cảm Xúc
+(Model: Happy/Sad/Neutral)"]
+	5 [label="Hiển Thị Kết Quả
+(Ảnh + Cảm Xúc)"]
+	1 -> 2
+	2 -> 3
+	3 -> 4
+	4 -> 5
+}
